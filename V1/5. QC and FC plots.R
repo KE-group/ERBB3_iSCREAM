@@ -13,7 +13,7 @@ allMuts <- readRDS("20210108.ERBB3_iSCREAM_V1_Mutations.RDS")
 # Compare concordance in VFs
 value <- lm(allMuts$Plasmid.VF~allMuts$V1_WEHI.VF)
 anno_text <- paste("Slope:",signif(value$coefficients[[2]],2),"\nIntercept:",signif(value$coefficients[[1]],1));rm(value)
-p <- ggplot(data = allMuts,aes(x=Plasmid.VF, y=V1_WEHI.VF)) + geom_point(alpha=0.15) + geom_smooth(method = "lm", se = F, color="#f6546a") + xlab("Plasmid Library") + ylab("V1/+ WEHI sample") + ggtitle("VF (1 dot = 1 mutation) compared between samples")+ annotate("text",x=0.3,y=1.5,label=anno_text)  + customtheme
+p <- ggplot(data = allMuts,aes(x=Plasmid.VF, y=V1_WEHI.VF)) + geom_point(alpha=0.15) + geom_smooth(method = "lm", se = F, color="#f6546a") + xlab("Plasmid Library") + ylab("V1/+ WEHI sample") + ggtitle("VF (1 dot = 1 mutation) compared between samples")+ annotate("text",x=0.3,y=1.5,label=anno_text) + geom_text(data = na.exclude(allMuts[allMuts$V1_WEHI.VF>=0.30 & allMuts$Plasmid.VF<0.2,]),aes(label=AAchange),size=3,hjust = 0, nudge_x = 0.005,family="serif") + customtheme ; p
 
 ggsave(filename = "Cor_Lib vs WEHI.svg",plot = p,width = 5,height = 5);rm(p,anno_text)
 #--------->

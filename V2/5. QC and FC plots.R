@@ -5,8 +5,8 @@ require(ggplot2)
 source('https://raw.githubusercontent.com/dchakro/ggplot_themes/master/DC_theme_generator.R')
 customtheme <- DC_theme_generator(type='L',ticks = "in",fontsize.cex = 1.2)
 
-setwd("/Users/deepankar/Documents/Seafile/NGS-Data-DC/BaseSpace/20201125 Marika ERBB3 iSCREAM/Analysis/Figures/")
-allMuts <- readRDS("20201216.ERBB3_iSCREAM_Mutations.RDS")
+setwd("/Users/deepankar/Documents/Seafile/NGS-Data-DC/BaseSpace/20201125 Marika ERBB3 iSCREAM/Analysis/Figures/V2/")
+allMuts <- readRDS("20201216.ERBB3_iSCREAM_V2_Mutations.RDS")
 
 
 #--------->
@@ -19,7 +19,7 @@ ggsave(filename = "Cor_Lib vs PCR.svg",plot = p,width = 5,height = 5);rm(p,anno_
 
 value <- lm(allMuts$Plasmid.VF~allMuts$V2_WEHI.VF)
 anno_text <- paste("Slope:",signif(value$coefficients[[2]],2),"\nIntercept:",signif(value$coefficients[[1]],1));rm(value)
-p <- ggplot(data = allMuts,aes(x=Plasmid.VF, y=V2_WEHI.VF)) + geom_point(alpha=0.15) + geom_smooth(method = "lm", se = F, color="#f6546a") + xlab("Plasmid Library") + ylab("V2/+ WEHI sample") + ggtitle("VF (1 dot = 1 mutation) compared between samples")+ annotate("text",x=0.3,y=1.5,label=anno_text)  + customtheme
+p <- ggplot(data = allMuts,aes(x=Plasmid.VF, y=V2_WEHI.VF)) + geom_point(alpha=0.15) + geom_smooth(method = "lm", se = F, color="#f6546a") + xlab("Plasmid Library") + ylab("V2/+ WEHI sample") + ggtitle("VF (1 dot = 1 mutation) compared between samples")+ annotate("text",x=0.3,y=1.5,label=anno_text) +geom_text(data = na.exclude(allMuts[allMuts$V2_WEHI.VF>=0.35 & allMuts$Plasmid.VF<0.25,]),aes(label=AAchange),size=3,hjust = 0, nudge_x = 0.005,family="serif") + customtheme ; p
 
 ggsave(filename = "Cor_Lib vs WEHI.svg",plot = p,width = 5,height = 5);rm(p,anno_text)
 #--------->
