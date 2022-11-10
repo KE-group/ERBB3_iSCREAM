@@ -44,9 +44,25 @@ source('https://raw.githubusercontent.com/dchakro/ggplot_themes/master/DC_theme_
 
 setwd("/Users/deepankar/Documents/Seafile/NGS-Data-DC/BaseSpace/20201125 Marika ERBB3 iSCREAM/Analysis/Figures/")
 
+source("https://github.com/dchakro/shared_Rscripts/raw/master/Annovar/Annovar_cDNA_Find.R")
+
 V1.bak <- as.data.table(readRDS("V1/20210108.ERBB3_iSCREAM_V1_Mutations.RDS"))
+V1.bak$cDNAchange=annovar_cDNA_Find(V1.bak$AAChange.refGene,
+                                     isoform = "NM_001982") 
 V2.bak <- as.data.table(readRDS("V2/20201216.ERBB3_iSCREAM_V2_Mutations.RDS"))
+V2.bak$cDNAchange=annovar_cDNA_Find(V2.bak$AAChange.refGene,
+                                     isoform = "NM_001982") 
 objects_to_retain <- c("objects_to_retain",ls())
+
+# ------
+dim(V1.bak[!is.na(Plasmid_PCR.VF),])
+dim(V1.bak[!is.na(Plasmid.VF),])
+
+dim(V2.bak[!is.na(Plasmid_PCR.VF),])
+dim(V2.bak[!is.na(Plasmid.VF),])
+
+V1.bak[!is.na(Plasmid_PCR.VF),.N,.(AAchange)]
+V1.bak[!is.na(Plasmid.VF),.N,.(AAchange)]
 
 # Correlation <-------
 rm(list = ls()[!ls() %in% objects_to_retain]); gc()
@@ -121,10 +137,19 @@ missing_index <- which(is.na(plotMuts$AAchange))
 plotMuts$AAchange[missing_index] <-
   V1$AAchange[match(plotMuts$MutID[missing_index], V1$MutID)]
 
+plotMuts$cDNAchange <- V2$cDNAchange[match(plotMuts$MutID, V2$MutID)]
+missing_index <- which(is.na(plotMuts$cDNAchange))
+plotMuts$cDNAchange[missing_index] <-
+  V1$cDNAchange[match(plotMuts$MutID[missing_index], V1$MutID)]
+
 plotMuts <- data.table:::na.omit.data.table(plotMuts)
-plotMuts[, colnames(plotMuts)[grep(pattern = "V[12].*", x = colnames(plotMuts))] := NULL]
+# plotMuts[, colnames(plotMuts)[grep(pattern = "V[12].*", x = colnames(plotMuts))] := NULL]
 
 plotMuts[, AAPos := as.numeric(MutSiteFind(plotMuts$AAchange))]
+plotMuts[, cDNAPos := as.numeric(MutSiteFind(plotMuts$cDNAchange))]
+
+# saveRDS(object = plotMuts,file = "20220506.plotMuts.RDS")
+
 customtheme <- DC_theme_generator(type='L',
                                   ticks = "in",
                                   fontsize.cex = 1,
@@ -135,59 +160,68 @@ customtheme <- DC_theme_generator(type='L',
 
 library(fitdistrplus)
 set.seed(2022)
+
 plotMuts[,log_FC := log2(FC)]
 p <- ggplot(data = plotMuts,aes(x=log_FC))+
-  geom_density()+ 
+  geom_density()+
   geom_vline(xintercept = mean(plotMuts$log_FC),
                linetype = "dashed",
                color="black")+
-  scale_y_continuous(limits = c(0,1))+
   customtheme
 
-p <- p + geom_density(data = plotMuts, 
-                  aes(x = log2(V1)),
-                  fill="#0057e7",
-                  alpha=0.3,
-                  color=NA)+
-  geom_density(data = plotMuts, 
-               aes(x = log2(V2_noIL3)),
-               fill="#008744",
-               alpha=0.3,
-               color=NA)+
-  geom_density(data = plotMuts, 
-               aes(x = log2(V2)),
-               fill="#d62d20",
-               alpha=0.3,
-               color=NA)+
-  scale_y_continuous(limits = c(0,0.5))
+# p <- p + geom_density(data = plotMuts,
+#                   aes(x = log2(V1)),
+#                   fill="#0057e7",
+#                   alpha=0.3,
+#                   color=NA)+
+#   geom_density(data = plotMuts,
+#                aes(x = log2(V2_noIL3)),
+#                fill="#008744",
+#                alpha=0.3,
+#                color=NA)+
+#   geom_density(data = plotMuts,
+#                aes(x = log2(V2)),
+#                fill="#d62d20",
+#                alpha=0.3,
+#                color=NA)+
+#   scale_y_continuous(limits = c(0,0.5))
+# # ggsave(filename = "Distribution problems/ERBB3_individual.png",
+# #        plot = p,
+# #        height = 4,
+# #        width = 5)
 
-ggsave(filename = "Distribution problems/ERBB3_individual.png",
-       plot = p, 
-       height = 4,
-       width = 5)
 
 
-Mixture <- data.frame(model1=rep(NA, 50000),model2=NA)
-set.seed(2022)
-Mixture$model1 <- fGarch::rsnorm(n = 50000, mean = -2.5, sd = 2.5, xi = -1.1 )
-Mixture$model2 <- fGarch::rsnorm(n = 50000, mean = -0.1, sd = 0.75 , xi = 1)
-
-p + geom_density(data = Mixture, 
-                 aes(x = model1),
-                 fill="#0000FF",
-                 alpha=0.3,
-                 color=NA)+
-  geom_density(data = Mixture, 
-               aes(x = model2),
-               fill="#FF0000",
-               alpha=0.3,
-               color=NA)+
-  geom_vline(xintercept = -0.1,
-             linetype = "dotted",
-             color="red")+
-  geom_vline(xintercept = -2.5,
-             linetype = "dotted",
-             color="blue")
+# set.seed(2022)
+# # mu1 <- -2.5 ; sd1 <- 3
+# # mu2 <- 0; sd2 <- 1
+# dist.size <- 5000
+# Mixture <- data.frame(model1=rep(NA, dist.size),model2=NA)
+# # 
+# # Mixture$model1 <- fGarch::rsnorm(n = dist.size, mean = mu1, sd = sd1, xi = -1.1 )
+# # Mixture$model2 <- fGarch::rsnorm(n = dist.size, mean = mu2, sd = sd2 , xi = 1)
+# 
+# # Mixture$model1 <- rnorm(n = 100, mean = mu1, sd = sd1)
+# x <- base::seq(from=-5,to=5,length.out=5000)
+# Mixture$model1 <- dnorm(x = x, mean = mean(x), sd = sd(x))
+# plot(Mixture$model1,type="l")
+# 
+# p + geom_line(data = Mixture, 
+#                  aes(y = model1),
+#                  alpha=0.3,
+#                  color="#0000FF")+
+#   geom_density(data = Mixture, 
+#                aes(x = model2),
+#                fill="#FF0000",
+#                alpha=0.3,
+#                color=NA)+
+#   geom_vline(xintercept = mu1,
+#              linetype = "dotted",
+#              color="blue")+
+#   geom_vline(xintercept = mu2,
+#              linetype = "dotted",
+#              color="red")+
+#   scale_x_continuous(limits = range(plotMuts$log_FC))
 
 #-----------
 
@@ -227,15 +261,16 @@ plotMuts$FDR <- p.adjust(p = plotMuts$P.value, method = "fdr")
 # Calculating threshold and selecting mutations above threshold
 (critical.value <-
     qnorm(
-      p = 5.613646e-07,
+      p = 0.00001,
       mean = normfit$estimate[['mean']],
       sd = normfit$estimate[['sd']]))
+2^abs(critical.value)
 FC.sub <- subset(plotMuts, plotMuts$FDR < 0.05)
 # FC.sub <- subset(plotMuts, plotMuts$FDR < 0.01 & plotMuts$FC > 1)
 
 
 #---- <----> ----
-# Drawing Fold chane scatter plot
+# Drawing Fold change scatter plot
 label_threshold <- 20
 p <- ggplot(plotMuts,aes(y=FC,x=AAPos,size=VF,color=VF))+
   geom_point(alpha=0.8)+
@@ -251,8 +286,27 @@ p <- ggplot(plotMuts,aes(y=FC,x=AAPos,size=VF,color=VF))+
                 label = plotMuts$AAchange[plotMuts$FC > label_threshold]),
                 hjust=1.3,
                 size=3)+
-  geom_hline(yintercept = 0,color="black")+
-  geom_hline(yintercept = 1,linetype="dashed",color="red",alpha=0.5);p
+  geom_hline(yintercept = 0,color="black");p
 # ggsave(filename =  "FC.plot.svg",plot = p,width = 10,height = 5)
 ggsave(filename =  "Hybrid-all-in-one-fold-change.pdf",plot = p,width = 10,height = 5)
 
+
+p <- ggplot(plotMuts,aes(y=FC,x=AAPos,size=VF,color=VF))+
+  geom_point(alpha=0.8)+
+  scale_colour_gradient(low="#003366",high="firebrick1")+
+  customtheme+
+  ggtitle(paste0("Fold Change: +NRG_to_NoIL3 (V1 & V2) vs NRG (n = ",nrow(plotMuts),")"))+
+  xlab("Amino Acid Position")+
+  ylab("Fold Change")+
+  scale_x_continuous(breaks = c(1,seq(50,1340,by = 50),1342))+
+  geom_text(data= plotMuts[plotMuts$FC > label_threshold, ],
+            aes(x = AAPos, 
+                y = FC,
+                label = plotMuts$AAchange[plotMuts$FC > label_threshold]),
+            hjust=1.3,
+            size=3)+
+  geom_hline(yintercept = 0,color="black")+
+  scale_y_continuous(limits = c(0,110));p
+# ggsave(filename =  "FC.plot.svg",plot = p,width = 10,height = 5)
+ggsave(filename =  "Hybrid-zoomed-all-in-one-fold-change.pdf",plot = p,width = 10,height = 3)
+getwd()

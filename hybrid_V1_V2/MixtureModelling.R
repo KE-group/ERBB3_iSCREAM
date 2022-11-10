@@ -145,6 +145,10 @@ customtheme <- DC_theme_generator(type='L',
                                   fontsize.cex = 1,
                                   title.fontsize.cex = 1)
 
+#---- Stats & Library QC plots
+plotMuts[,.N, .(AAchange)]
+
+
 #---- <----> ----
 # Fitting distribution and finding critical value
 
@@ -160,6 +164,7 @@ mixtools::plot.mixEM(
   which = 2,
   density = TRUE,
   cex.axis = 1.4,
+
   cex.lab = 1.4,
   cex.main = 1.8,
   main2 = "Gaussian mixture",
@@ -167,7 +172,8 @@ mixtools::plot.mixEM(
 )
 lines(density(plotMuts$log_FC),lty=2,lwd=2)
 summary(model)
-abline(v = c(4,6),lty=2) 
+abline(v=model$mu,lty=2,col=c("red","green"))
+# abline(v = c(4,6),lty=2) 
 
 # Sampling from fitted distribution
 probabilities <- model$lambda
@@ -203,14 +209,14 @@ plotMuts$FDR_1 <- p.adjust(p = plotMuts$P.value, method = "bonferroni")
 plotMuts[,P.value:=NULL]
 View(plotMuts[FDR_1<0.05 & log_FC>1,])
 sub <- plotMuts[FDR_1<0.05 & log_FC>1,]
-write.table(
-  sub,
-  file = "FDR_0.05_dist1_hits.csv",
-  sep = ",",
-  quote = F,
-  col.names = T,
-  row.names = F
-)
+# write.table(
+#   sub,
+#   file = "FDR_0.05_dist1_hits.csv",
+#   sep = ",",
+#   quote = F,
+#   col.names = T,
+#   row.names = F
+# )
 
 # Distribution 2
 X <- sort(plotMuts$log_FC)
@@ -235,15 +241,27 @@ plotMuts$FDR_2 <- p.adjust(p = plotMuts$P.value, method = "bonferroni")
 plotMuts[,P.value:=NULL]
 View(plotMuts[FDR_2<0.00001 & log_FC>1,])
 sub <- plotMuts[FDR_2<0.00001 & log_FC>1,]
-write.table(
-  sub,
-  file = "FDR_0.00001_dist2_hits.csv",
-  sep = ",",
-  quote = F,
-  col.names = T,
-  row.names = F
-)
+# write.table(
+#   sub,
+#   file = "FDR_0.00001_dist2_hits.csv",
+#   sep = ",",
+#   quote = F,
+#   col.names = T,
+#   row.names = F
+# )
 
+
+library(EnvStats)
+
+generated_values <- rnormMix(8737, mean1 = mu[1], sd1 = sigma[1], mean2 = mu[2], sd2 = sigma[2], p.mix = 0.4)
+plot(density(generated_values),xlab = "log2(fold change)")
+
+data.table::setorder(plotMuts, -log_FC)
+
+plotMuts[,z:=((FC-mean(log_FC))/sd(log_FC))]
+plotMuts$p_val <- 1-pnormMix(plotMuts$z,mean1 = mu[1], sd1 = sigma[1], mean2 = mu[2], sd2 = sigma[2], p.mix = 0.4)
+plotMuts$p.adj <- p.adjust(plotMuts$p_val,method = "fdr")
+View(plotMuts[,c(10,14,18,19)])
 
 # model <- spEMsymloc(plotMuts$log_FC,mu=c(0,-2.5),bw=1)
 # lines(density(plotMuts$log_FC),lty=2,lwd=2)
