@@ -9,6 +9,7 @@ V1 <- setDT(readRDS("/Volumes/DATA/Seafile/NGS-Data-DC/BaseSpace/20201125 Marika
 
 V2 <- setDT(readRDS("/Volumes/DATA/Seafile/NGS-Data-DC/BaseSpace/20201125 Marika ERBB3 iSCREAM/Analysis/Figures/V2/20201216.ERBB3_iSCREAM_V2_Mutations.RDS"))
 
+# creating unique list of mutations in the screen
 excel <- unique.data.frame(rbind(V1[,c(10,1:5,26,9)], V2[,c(10,1:5,29,9)]))
 
 excel$Plasmid_PCR.AD <- V1$Plasmid_PCR.AD[match(x = excel$MutID, table = V1$MutID)]
@@ -49,7 +50,7 @@ excel$V2_noIL3.VF <- V2$V2_noIL3.VF[match(x = excel$MutID, table = V2$MutID)]
 
 write.table(
   x = excel,
-  file = "OneDrive - O365 Turun yliopisto/Klaus lab/Manuscripts/Marika ERBB3 screen/Figures/Excel for Processed NGS data.tsv",
+  file = "~/OneDrive - O365 Turun yliopisto/Klaus lab/Manuscripts/Marika ERBB3 screen/Figures/Processed Illumina data.tsv",
   quote = F,
   sep = "\t",
   row.names = F,
