@@ -4,7 +4,6 @@ rm(list = ls())
 gc()
 library(data.table)
 #--------> Combining files <------------
-rm(list=ls())
 # True Hits
 setwd("/Volumes/DATA/Seafile/NGS-Data-DC/PacBio/20210909 iSCREAM Run1/analysis/Figures/Bootstrap/Data/")
 dir.create("./combined_hits", showWarnings = F)
@@ -44,12 +43,12 @@ combine <- function(dirname){
   setorder(dat, -NRG_to_NoLig,na.last = T)
   
   
-  dat[,NRG_to_NoLig := NRG_to_NoLig / 291190] # total reads (from flagstat)
-  dat[,NRG := NRG / 217694] # total reads (from flagstat)
-  dat[,WEHI := WEHI / 144629]   # total reads (from flagstat)
+  # dat[,NRG_to_NoLig := NRG_to_NoLig / 291190] # total reads (from flagstat)
+  # dat[,NRG := NRG / 217694] # total reads (from flagstat)
+  # dat[,WEHI := WEHI / 144629]   # total reads (from flagstat)
   
   dat[, FC := NRG_to_NoLig/NRG]
-  dat <- dat[!is.na(FC),]
+  # dat <- dat[!is.na(FC),]
   dat[, FC_text := format(FC, scientific = F,digits = 2)]
   setorder(dat, -FC, na.last = T)
   setwd("..")
@@ -58,4 +57,7 @@ combine <- function(dirname){
 
 hits <- combine(dirname = "20221110_214857/")
 set1 <- combine(dirname = "20221110_220920/")
+set2 <- combine(dirname = "20221110_230051/")
+set3 <- combine(dirname = "20221110_230409")
+set3 <- combine(dirname = "20221111_163106/")
 

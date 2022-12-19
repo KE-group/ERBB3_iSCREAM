@@ -8,6 +8,7 @@ source("/Users/deepankar/OneDrive - O365 Turun yliopisto/Git/GitHub/KE-Group/ERB
 # Setting the hits from Marika's figure to search the data.
 hits <- readRDS("/Users/deepankar/Documents/Seafile/NGS-Data-DC/BaseSpace/20201125 Marika ERBB3 iSCREAM/Analysis/Figures/20220506.plotMuts.RDS")
 hits <- hits[hits$FC > 25]
+# hits <- hits[hits$FC > 25 & hits$VF>0.01 ]
 
 # Finding reference altered nucleotides for the selected mutations.
 ref_start <- stringi::stri_locate_first_regex(str = hits$MutID,pattern = "chr[0-9]{1,2}:[0-9]+")[,"end"]
@@ -24,18 +25,16 @@ chr_mutation_vector <- find_mutID_to_test(hits)
 data_analysis(chr_mutation_vector)
 
 
-# -----------> 18 random hits FC≈1 (1±10%) <-----------
+# -----------> Random hits FC < 25 <-----------
 
 # Setting the hits from Marika's figure to search the data.
 hits <- readRDS("/Users/deepankar/Documents/Seafile/NGS-Data-DC/BaseSpace/20201125 Marika ERBB3 iSCREAM/Analysis/Figures/20220506.plotMuts.RDS")
+hits <- hits[hits$FC < 25 & hits$VF>0.01 ]
 
-# Taking 18 samples with FC of 1 ± 10% (i.e. between 0.9 and 1)
-idx <- sample(
-  x = which(hits$FC >= 0.2 & hits$FC <= 5 & hits$VF > 0.05),
-  size = 18,
-  replace = F
-)
-hits <- hits[idx,]
+# Selecting 100 mutations at random
+idx <- sample(x = seq_along(hits$MutID), size = 100, replace = F)
+hits <- hits[idx, ]
+rm(idx)
 
 # Finding reference altered nucleotides for the selected mutations.
 ref_start <- stringi::stri_locate_first_regex(str = hits$MutID,pattern = "chr[0-9]{1,2}:[0-9]+")[,"end"]
