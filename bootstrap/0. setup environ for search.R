@@ -31,9 +31,9 @@ all_samples <- c("1.EGFR Library",
                  "7.ERBB3 WEHI V2",
                  "8.ERBB3 NRG V2",
                  "9.ERBB3_NRG_to_NoLig_V2",
-                 "10.ERBB3 NoLigand")
+                 "10.ERBB3 NoLigand_V2")
 all_samples <- gsub(" ","_",all_samples)
-searchSamples <- all_samples[c(7, 8, 9, 10)]
+searchSamples <- all_samples[c(7, 8, 9, 10,17,18,19,20)]
 rm(all_samples)
 
 # Setting up WT and codonDF for doing translations of detected nt changes (from PacBio data)
