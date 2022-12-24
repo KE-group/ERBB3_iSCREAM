@@ -3,10 +3,16 @@ Sys.setlocale("LC_MESSAGES", 'en_GB.UTF-8')
 Sys.setenv(LANG = "en_US.UTF-8")
 
 # Setting the hits from Marika's figure to search the data.
-hits <- readRDS("/Users/deepankar/Documents/Seafile/NGS-Data-DC/BaseSpace/20201125 Marika ERBB3 iSCREAM/Analysis/Figures/20220506.plotMuts.RDS")
+hits <- readRDS("/Users/deepankar/Documents/Seafile/NGS-Data-DC/Illumina/iSCREAM/ERBB3/20201125 Marika ERBB3 iSCREAM/Analysis/Figures/20220506.plotMuts.RDS")
 # hits <- hits[hits$FC > 25,]
 # hits <- hits[hits$FC > 25 & hits$VF>0.01, ]
-hits <- hits[sample(x = which(hits$FC < 25 & FC > 1 & hits$VF>0.01),size = 18,replace = F), ]
+ 
+# # Selecting 18 random mutations with FC < 25 and FC > 1 and VF > 1%
+# hits <- hits[sample(x = which(hits$FC < 25 & FC > 1 & hits$VF>0.01),size = 18,replace = F), ]
+
+# Selecting all mutations between FC of 1 - 25 (in Illumina data!!)
+hits <- hits[which(hits$FC < 25 & hits$FC > 1 & hits$VF>0.01),]
+hits <- hits[-grep(pattern = "*",x =  hits$AAchange, fixed = T),] # removing rows with nonsense mutations
 
 # Finding reference altered nucleotides for the selected mutations.
 ref_start <- stringi::stri_locate_first_regex(str = hits$MutID,pattern = "chr[0-9]{1,2}:[0-9]+")[,"end"]
