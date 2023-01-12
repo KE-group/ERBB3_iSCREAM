@@ -231,3 +231,17 @@ table(control$N_mutants)/nrow(control)
 # hits$N_mutants[hits$N_mutants>2] = 3
 # set1$N_mutants[set1$N_mutants>2] = 3
 # 
+
+# chisq test
+Table1 <- fread("/Users/deepankar/OneDrive - O365 Turun yliopisto/Klaus lab/Manuscripts/Marika ERBB3 screen/Figures/PacBio genotye composition/FC_above_25.tsv")
+Table1$Group <- "enriched"
+
+Table2 <- fread("/Users/deepankar/OneDrive - O365 Turun yliopisto/Klaus lab/Manuscripts/Marika ERBB3 screen/Figures/PacBio genotye composition/control.tsv")
+Table2$Group <- "control"
+
+combined <- rbind(Table1[,c(1,4,5)],Table2[,c(1,4,5)])
+
+
+table(combined$Group,combined$N_mutants)
+chisq.test(combined$Group,combined$N_mutants)
+chisq.test(combined$Group,combined$N_mutants,simulate.p.value = T)
