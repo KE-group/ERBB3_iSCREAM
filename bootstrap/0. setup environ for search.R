@@ -5,10 +5,12 @@
 rm(list=ls())
 
 # Set up code
-source("/Users/deepankar/OneDrive - O365 Turun yliopisto/Git/GitHub/KE-Group/PacBio iSCREAM run1/annotate_cDNAchange_vectorized.R")
+# source("/Users/deepankar/OneDrive - O365 Turun yliopisto/Git/GitHub/KE-Group/PacBio iSCREAM run1/annotate_cDNAchange_vectorized.R")
+source("/Users/chakrobd/Library/CloudStorage/GoogleDrive-robocopalpha404@gmail.com/My Drive/Git/GitHub/KE-Group/PacBio iSCREAM run1/annotate_cDNAchange_vectorized.R")
 source("https://raw.githubusercontent.com/dchakro/shared_Rscripts/master/parse_IUPAC_AAchange.R")
 library(data.table)
-setwd("/Volumes/DATA/Seafile/NGS-Data-DC/PacBio/20210909 iSCREAM Library and samples/analysis")
+# setwd("/Volumes/DATA/Seafile/NGS-Data-DC/PacBio/20210909 iSCREAM Library and samples/analysis")
+setwd("/Volumes/UTU_KE_2TB/Seafile/NGS-Data-DC/PacBio/20210909 iSCREAM Library and samples/analysis")
 dir.create("./Figures/Bootstrap/Data",recursive = T, showWarnings = F)
 setwd("./Figures/Bootstrap/Data/")
 
@@ -37,7 +39,7 @@ searchSamples <- all_samples[c(7, 8, 9, 10,17,18,19,20)]
 rm(all_samples)
 
 # Setting up WT and codonDF for doing translations of detected nt changes (from PacBio data)
-referenceSeq <- "/Volumes/DATA/Seafile/NGS-Data-DC/PacBio/20210909 iSCREAM Library and samples/reference/pBG-ERBB3/ERBB3.fa"
+referenceSeq <- "/Volumes/UTU_KE_2TB/Seafile/NGS-Data-DC/PacBio/20210909 iSCREAM Library and samples/reference/pBG-ERBB3/ERBB3.fa"
 wt_dna <- as.character(Biostrings::readDNAStringSet(filepath = referenceSeq, format = "fasta"))
 codonDF <- as.data.table(DNA2codons(inputText = wt_dna)[[2]])
 rm(referenceSeq)
@@ -107,7 +109,7 @@ data_analysis <- function(chr_mutation_vector){
     # Mutation <- Mutation[1]
     FILE <-
       paste0(
-        "/Volumes/DATA/Seafile/NGS-Data-DC/PacBio/20210909 iSCREAM Library and samples/analysis/sam2tsv/results/",
+        "/Volumes/UTU_KE_2TB/Seafile/NGS-Data-DC/PacBio/20210909 iSCREAM Library and samples/analysis/sam2tsv/results/",
         SAMPLE,
         "_sam.tsv.gz"
       )
@@ -168,7 +170,7 @@ find_mutID_to_test <- function(hits=NULL){
 
 # -----------> Setting up iSCREAM data DF from PacBio <-----------
 # reading file
-iSCREAM <- readRDS("/Volumes/DATA/Seafile/NGS-Data-DC/PacBio/20210909 iSCREAM Library and samples/analysis/filtered/R.Binary/ERBB3_V1_iSCREAM.RDS")
+iSCREAM <- readRDS("/Volumes/UTU_KE_2TB/Seafile/NGS-Data-DC/PacBio/20210909 iSCREAM Library and samples/analysis/filtered/R.Binary/ERBB3_V1_iSCREAM.RDS")
 
 # calculating NRG -> No lig Fold change and sorting the DT based on that
 iSCREAM[, FC := NRG_to_NoLig_V1_VF / NRG_V1_VF]
