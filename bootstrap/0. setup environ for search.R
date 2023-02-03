@@ -6,7 +6,7 @@ rm(list=ls())
 
 # Set up code
 # source("/Users/deepankar/OneDrive - O365 Turun yliopisto/Git/GitHub/KE-Group/PacBio iSCREAM run1/annotate_cDNAchange_vectorized.R")
-source("/Users/chakrobd/Library/CloudStorage/GoogleDrive-robocopalpha404@gmail.com/My Drive/Git/GitHub/KE-Group/PacBio iSCREAM run1/annotate_cDNAchange_vectorized.R")
+source("/Volumes/GoogleDrive/My Drive/Git/GitHub/KE-Group/PacBio iSCREAM run1/annotate_cDNAchange_vectorized.R")
 source("https://raw.githubusercontent.com/dchakro/shared_Rscripts/master/parse_IUPAC_AAchange.R")
 library(data.table)
 # setwd("/Volumes/DATA/Seafile/NGS-Data-DC/PacBio/20210909 iSCREAM Library and samples/analysis")
