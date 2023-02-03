@@ -1,5 +1,6 @@
 ## Description: Combining readcounts and calculating FC for 
 ##              bootstrap of controls (10 rounds x 18 mutations)
+## Note: Bootstrapping is a statistical procedure that resamples a single dataset to create many simulated samples.
 # ---- Fri, Feb 03, 2023 @ 07:39 ----
 
 rm(list = ls())
@@ -120,11 +121,11 @@ resultsDT <-
     More = unlist(lapply(output, `[[`, 3))
   )
 
-# write.table(
-#   x = control,
-#   file = "~/Desktop/control.tsv",
-#   quote = F,
-#   sep = "\t",
-#   row.names = F,
-#   col.names = T
-# )
+write.table(
+  x = resultsDT,
+  file = "~/Desktop/bootstrap-control.tsv",
+  quote = F,
+  sep = "\t",
+  row.names = F,
+  col.names = T
+)
